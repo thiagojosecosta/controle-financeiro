@@ -3,6 +3,7 @@
 import { Injectable } from '@angular/core';
 import { TransactionService } from './transaction.service';
 import { Transaction } from '../models/transaction';
+import { getDatePart } from '../utils/date.util';
 
 @Injectable({
   providedIn: 'root',
@@ -85,11 +86,8 @@ export class FinanceService {
     const targetYear = month ? month.getFullYear() : new Date().getFullYear();
 
     const transactions = this.generateEffectiveTransactions().filter((t) => {
-      const transactionDate = new Date(t.date);
-      return (
-        transactionDate.getMonth() === targetMonth &&
-        transactionDate.getFullYear() === targetYear
-      );
+      const { year, month } = getDatePart(t.date);
+      return month === targetMonth && year === targetYear;
     });
 
     const income = transactions

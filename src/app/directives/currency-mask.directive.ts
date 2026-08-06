@@ -1,14 +1,26 @@
 // ARQUIVO: src/app/directives/currency-mask.directive.ts
 
-import { Directive, HostListener, ElementRef } from '@angular/core';
+import { Directive, HostListener, ElementRef, OnInit } from '@angular/core';
 import { NgControl } from '@angular/forms';
 
 @Directive({
   selector: '[appCurrencyMask]',
   standalone: true,
 })
-export class CurrencyMaskDirective {
+export class CurrencyMaskDirective implements OnInit {
   constructor(private el: ElementRef, private ngControl: NgControl) {}
+
+  ngOnInit(): void {
+    // Quando o formulário é preenchido programaticamente (ex: editar uma regra),
+    // o input não recebe o evento 'input', então formatamos o valor inicial aqui.
+    const initialValue = this.ngControl.control?.value;
+    if (typeof initialValue === 'number' && !isNaN(initialValue)) {
+      this.el.nativeElement.value = new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+      }).format(initialValue);
+    }
+  }
 
   @HostListener('input', ['$event'])
   onInputChange(event: Event) {

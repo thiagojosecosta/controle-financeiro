@@ -16,6 +16,7 @@ import { FinanceService } from '../../services/finance.service';
 import { TransactionService } from '../../services/transaction.service';
 import { NotificationService } from '../../services/notification.service';
 import { TransactionsComponent } from '../transactions/transactions'; // Importar
+import { getDatePart, isSameOrBeforeDay } from '../../utils/date.util';
 
 Chart.register(...registerables);
 
@@ -75,12 +76,8 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
     const today = new Date();
 
     this.transactionHistory = this.allTransactions.filter((t) => {
-      const transactionDate = new Date(t.date);
-
-      const isPastOrPresent = transactionDate <= today;
-
-      const isFutureExpense = t.type === 'expense' && transactionDate > today;
-
+      const isPastOrPresent = isSameOrBeforeDay(t.date, today);
+      const isFutureExpense = t.type === 'expense' && !isPastOrPresent;
       return isPastOrPresent || isFutureExpense;
     });
 
@@ -96,15 +93,6 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
     this.destroyCharts(); // Garante que gráficos antigos sejam destruídos
 
     const today = new Date();
-    const currentMonth = today.getMonth();
-    const currentYear = today.getFullYear();
-
-    // Filtra transações do MÊS ATUAL
-    const currentMonthTransactions = this.allTransactions.filter((t) => {
-      const d = new Date(t.date);
-      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-    });
-
     const summaryCurrentMonth = this.financeService.getMonthlySummary(today);
     this.incomeExpenseChart = new Chart(
       this.incomeExpenseChartRef.nativeElement,
@@ -166,11 +154,11 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
     const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
 
     this.nextMonthExpenses = this.allTransactions.filter((t) => {
-      const transactionDate = new Date(t.date);
+      const { year, month } = getDatePart(t.date);
       return (
         t.type === 'expense' &&
-        transactionDate.getMonth() === nextMonth.getMonth() &&
-        transactionDate.getFullYear() === nextMonth.getFullYear()
+        month === nextMonth.getMonth() &&
+        year === nextMonth.getFullYear()
       );
     });
 

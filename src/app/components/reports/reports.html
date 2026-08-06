@@ -67,6 +67,7 @@
           </option>
         </select>
       </div>
+      <div class="table-scroll">
       <table class="transaction-table">
         <thead>
           <tr>
@@ -96,7 +97,7 @@
             <td>
               <span class="description">{{ transaction.description }}</span>
               <span class="date">{{
-                transaction.date | date : "dd/MM/yyyy"
+                transaction.date | date : "dd/MM/yyyy" : "UTC"
               }}</span>
             </td>
             <td class="text-right transaction-value">
@@ -133,6 +134,7 @@
           </tr>
         </tbody>
       </table>
+      </div>
 
       <div class="pagination-controls" *ngIf="totalPages > 1">
         <button (click)="previousPage()" [disabled]="currentPage === 1">
@@ -147,8 +149,11 @@
   </div>
 </div>
 
-<div class="popup-overlay" *ngIf="isModalOpen">
-  <div class="popup-container">
-    <app-transactions (transactionSaved)="closeModal()"></app-transactions>
+<div class="popup-overlay" *ngIf="isModalOpen" (click)="closeModal()">
+  <div class="popup-container" (click)="$event.stopPropagation()">
+    <app-transactions
+      [autoOpen]="true"
+      (transactionSaved)="closeModal()"
+    ></app-transactions>
   </div>
 </div>

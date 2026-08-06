@@ -46,7 +46,7 @@
               transaction.description
             }}</span>
             <span class="transaction-date">{{
-              transaction.date | date : "dd/MM/yyyy"
+              transaction.date | date : "dd/MM/yyyy" : "UTC"
             }}</span>
           </div>
         </div>

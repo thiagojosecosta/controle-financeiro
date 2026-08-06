@@ -66,7 +66,9 @@
         </div>
         <div class="transaction-details">
           <span class="description">{{ transaction.description }}</span>
-          <span class="date">{{ transaction.date | date : "dd/MM/yyyy" }}</span>
+          <span class="date">{{
+            transaction.date | date : "dd/MM/yyyy" : "UTC"
+          }}</span>
         </div>
         <div class="transaction-value">
           <span *ngIf="isBalanceVisible">{{
@@ -89,6 +91,7 @@
 >
   <div class="modal-content" (click)="$event.stopPropagation()">
     <app-transactions
+      [autoOpen]="true"
       (transactionSaved)="onTransactionSaved()"
     ></app-transactions>
   </div>

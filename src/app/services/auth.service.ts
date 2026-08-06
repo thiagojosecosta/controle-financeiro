@@ -1,6 +1,6 @@
 // ARQUIVO: src/app/services/auth.service.ts
 
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { User } from '../models/user.model';
@@ -14,12 +14,17 @@ export class AuthService {
   private SESSION_KEY = 'financial_app_session';
   private isBrowser: boolean;
 
+  // Sinal reativo com o usuário logado, para que a UI (ex: cabeçalho) se
+  // atualize automaticamente quando o perfil mudar, sem precisar recarregar a página.
+  readonly currentUser = signal<User | null>(null);
+
   constructor(
     @Inject(PLATFORM_ID) private platformId: object,
     private router: Router,
     private notificationService: NotificationService // Injete o serviço
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
+    this.currentUser.set(this.getCurrentUser());
   }
 
   // --- LÓGICA DE LOGIN CORRIGIDA ---
@@ -36,6 +41,7 @@ export class AuthService {
         // Remove a senha antes de salvar na sessão por segurança
         const { password, ...userToStore } = user;
         localStorage.setItem(this.SESSION_KEY, JSON.stringify(userToStore));
+        this.currentUser.set(userToStore as User);
       }
       return true;
     }
@@ -63,6 +69,7 @@ export class AuthService {
     if (this.isBrowser) {
       localStorage.removeItem(this.SESSION_KEY);
     }
+    this.currentUser.set(null);
     this.router.navigate(['/login']);
   }
 
@@ -89,6 +96,7 @@ export class AuthService {
     if (this.isBrowser) {
       const { password, ...userToStore } = userInDb;
       localStorage.setItem(this.SESSION_KEY, JSON.stringify(userToStore));
+      this.currentUser.set(userToStore as User);
     }
     return true;
   }

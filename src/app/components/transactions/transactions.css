@@ -314,3 +314,44 @@
   cursor: not-allowed;
   opacity: 0.5;
 }
+
+/* --- RESPONSIVIDADE (TABLET E CELULAR) --- */
+@media (max-width: 768px) {
+  .page-container {
+    padding: 1rem;
+  }
+  .header-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+  .transactions-container-card {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .transaction-item {
+    flex-wrap: wrap;
+    row-gap: 0.75rem;
+  }
+  .transaction-info {
+    flex-basis: 100%;
+  }
+  .transaction-value {
+    min-width: 0;
+    margin-right: auto;
+    text-align: left;
+  }
+  .popup-container {
+    width: 92%;
+    padding: 1.5rem;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .type-selection {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

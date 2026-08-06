@@ -5,6 +5,7 @@ import { User } from '../../models/user.model';
 import { FinanceService } from '../../services/finance.service';
 import { Transaction } from '../../models/transaction';
 import { TransactionsComponent } from '../transactions/transactions';
+import { isSameOrBeforeDay } from '../../utils/date.util';
 
 @Component({
   selector: 'app-dashboard-home',
@@ -45,7 +46,7 @@ export class DashboardHomeComponent implements OnInit {
   loadRecentTransactions() {
     const allTransactions = this.financeService.generateEffectiveTransactions();
     this.recentTransactions = allTransactions
-      .filter((t) => new Date(t.date) <= new Date())
+      .filter((t) => isSameOrBeforeDay(t.date, new Date()))
       .slice(0, 5);
   }
 

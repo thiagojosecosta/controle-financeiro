@@ -193,3 +193,65 @@ h1 {
   background-color: #e74c3c; /* Um tom de vermelho para alerta */
   color: #ffffff; /* Garante que o ícone e o texto fiquem brancos */
 }
+
+/* Fundo escurecido atrás da sidebar aberta no mobile (nada no desktop) */
+.sidebar-backdrop {
+  display: none;
+}
+
+/* --- RESPONSIVIDADE (TABLET E CELULAR) --- */
+@media (max-width: 900px) {
+  .main-content {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* No mobile a sidebar vira um menu "gaveta": fica fora da tela e
+     desliza por cima do conteúdo ao abrir, em vez de encolher para ícones. */
+  .sidebar {
+    transform: translateX(0);
+    width: 250px;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease-in-out;
+  }
+  /* isSidebarCollapsed começa true, então por padrão a gaveta fica fora da
+     tela; o mesmo modificador que no desktop encolhe pra ícones aqui esconde. */
+  .sidebar-collapsed .sidebar {
+    transform: translateX(-100%);
+    width: 250px;
+    padding: 20px 15px;
+  }
+  .sidebar .title-text,
+  .sidebar .nav-item span {
+    width: auto;
+    opacity: 1;
+    margin-left: 0;
+  }
+  .sidebar-collapsed .sidebar .nav-item,
+  .sidebar-collapsed .sidebar .sidebar-header,
+  .sidebar-collapsed .sidebar .sidebar-title-link {
+    justify-content: flex-start;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .main-content,
+  .sidebar-collapsed .main-content {
+    margin-left: 0;
+    width: 100%;
+    padding: 16px;
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.45);
+    z-index: 90;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+}

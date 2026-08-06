@@ -34,20 +34,6 @@
         >
       </div>
 
-      <div class="input-group">
-        <i class="fas fa-at"></i>
-        <input type="text" placeholder="Usuário" formControlName="usuario" />
-      </div>
-      <div
-        *ngIf="
-          registerForm.get('usuario')?.invalid &&
-          registerForm.get('usuario')?.touched
-        "
-        class="error-message"
-      >
-        O nome de usuário é obrigatório.
-      </div>
-
       <div class="input-group password-wrapper">
         <i class="fas fa-lock"></i>
         <input

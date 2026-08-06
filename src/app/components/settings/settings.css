@@ -124,3 +124,13 @@
   font-size: 0.8rem;
   margin-top: 0.25rem;
 }
+
+/* --- RESPONSIVIDADE (TABLET E CELULAR) --- */
+@media (max-width: 768px) {
+  :host {
+    padding: 1rem;
+  }
+  .card-body {
+    padding: 1.25rem;
+  }
+}

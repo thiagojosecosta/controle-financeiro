@@ -3,6 +3,7 @@
 import {
   Component,
   OnInit,
+  Input,
   Output,
   EventEmitter,
   HostListener,
@@ -21,6 +22,7 @@ import { AuthService } from '../../services/auth.service';
 import { TransactionService } from '../../services/transaction.service';
 import { NotificationService } from '../../services/notification.service';
 import { CurrencyMaskDirective } from '../../directives/currency-mask.directive';
+import { getDatePart } from '../../utils/date.util';
 
 @Component({
   selector: 'app-transactions',
@@ -43,6 +45,10 @@ export class TransactionsComponent implements OnInit {
   totalPages = 1;
   isBalanceVisible = true;
 
+  // Quando usado embutido dentro de um popup (Dashboard/Relatórios), abre o
+  // formulário de transação imediatamente em vez de mostrar a lista por baixo.
+  @Input() autoOpen = false;
+
   @Output() transactionSaved = new EventEmitter<void>();
 
   constructor(
@@ -63,17 +69,19 @@ export class TransactionsComponent implements OnInit {
       installments: [null],
     });
     this.loadAndFilterTransactions();
+    if (this.autoOpen) {
+      this.openModal();
+    }
   }
 
   loadAndFilterTransactions(): void {
     const today = new Date();
     const allProjected = this.financeService.generateEffectiveTransactions();
     this.allTransactions = allProjected.filter((t) => {
-      const transactionDate = new Date(t.date);
+      const { year, month } = getDatePart(t.date);
       return (
-        transactionDate.getFullYear() < today.getFullYear() ||
-        (transactionDate.getFullYear() === today.getFullYear() &&
-          transactionDate.getMonth() <= today.getMonth())
+        year < today.getFullYear() ||
+        (year === today.getFullYear() && month <= today.getMonth())
       );
     });
     this.updatePagination();
@@ -143,6 +151,11 @@ export class TransactionsComponent implements OnInit {
     this.isModalOpen = false;
     this.editingRuleId = null;
     this.transactionService.clearEdit();
+    // No modo embutido (autoOpen), cancelar deve fechar o popup pai também,
+    // em vez de deixar a lista completa de transações visível por baixo.
+    if (this.autoOpen) {
+      this.transactionSaved.emit();
+    }
   }
 
   onSubmit(): void {

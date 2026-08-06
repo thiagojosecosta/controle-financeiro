@@ -1,4 +1,9 @@
 <div class="dashboard-container" [class.sidebar-collapsed]="isSidebarCollapsed">
+  <div
+    class="sidebar-backdrop"
+    *ngIf="!isSidebarCollapsed"
+    (click)="toggleSidebar()"
+  ></div>
   <aside class="sidebar">
     <div class="sidebar-header">
       <a class="sidebar-title-link" routerLink="/dashboard">
@@ -137,7 +142,7 @@
             <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </button>
-        <h1>Olá, {{ userName }}!</h1>
+        <h1>Olá, {{ userName() }}!</h1>
       </div>
     </header>
 
