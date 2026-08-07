@@ -1,7 +1,8 @@
 // ARQUIVO: src/app/components/settings/settings.ts
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import {
   FormBuilder,
   FormGroup,
@@ -29,10 +30,20 @@ export class SettingsComponent implements OnInit {
   showNewPassword = false;
   showConfirmPassword = false;
 
+  // Cabeçalho visual do card de perfil (avatar-iniciais), reagindo ao mesmo
+  // sinal de usuário logado da sidebar.
+  profileName = computed(() => this.authService.currentUser()?.nome || '');
+  profileEmail = computed(() => this.authService.currentUser()?.email || '');
+  profileInitial = computed(() => {
+    const nome = this.authService.currentUser()?.nome;
+    return (nome ? nome.charAt(0) : '?').toUpperCase();
+  });
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private route: ActivatedRoute
   ) {
     this.profileForm = this.fb.group({
       // Corrigido para 'nome' para ser consistente com o modelo de utilizador
@@ -61,6 +72,16 @@ export class SettingsComponent implements OnInit {
         email: this.currentUser.email,
       });
     }
+
+    this.route.queryParams.subscribe((params) => {
+      if (params['section'] === 'password') {
+        setTimeout(() => {
+          document
+            .getElementById('password-card')
+            ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 0);
+      }
+    });
   }
 
   passwordMatchValidator(form: FormGroup) {

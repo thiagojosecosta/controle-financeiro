@@ -3,7 +3,7 @@
 :host {
   display: block;
   padding: 2rem;
-  background-color: #f4f7fa;
+  background-color: var(--background);
 }
 
 .reports-container {
@@ -20,13 +20,13 @@
 
 .header h1 {
   margin: 0;
-  font-size: 1.8rem;
-  color: #343a40;
+  font-size: 1.5rem;
+  color: var(--foreground);
 }
 
 .header p {
   margin-top: 0.25rem;
-  color: #6c757d;
+  color: var(--muted-foreground);
 }
 
 .row {
@@ -37,10 +37,11 @@
 }
 
 .card {
-  background-color: #ffffff;
+  background-color: var(--card);
+  border: 1px solid var(--border);
   padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
   /* Evita que o conteúdo (ex: tabela larga) force o grid a crescer além da tela */
   min-width: 0;
 }
@@ -54,24 +55,55 @@
 
 .card-header h3 {
   margin: 0;
-  font-size: 1.1rem;
-  color: #343a40;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--foreground);
 }
 
 .icon-button {
   background: transparent;
   border: none;
   cursor: pointer;
-  color: #adb5bd;
+  color: var(--muted-foreground);
   font-size: 1.2rem;
+  transition: color 0.2s;
+}
+.icon-button:hover {
+  color: var(--foreground);
 }
 
-/* Gráficos */
-.chart-card {
-  min-height: 350px;
+/* Gráfico de evolução do saldo */
+.balance-chart-card {
+  min-width: 0;
+}
+.balance-chart-container {
+  width: 100%;
+  height: 320px;
+  margin-top: 1rem;
+}
+
+.period-selector {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 0.35rem;
+}
+.period-btn {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--border);
+  background-color: var(--card);
+  color: var(--muted-foreground);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+.period-btn:hover {
+  border-color: var(--muted-foreground);
+}
+.period-btn.active {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
 }
 
 /* Card de Projeção */
@@ -80,15 +112,16 @@
   justify-content: space-between;
   align-items: baseline;
   font-size: 1rem;
-  color: #6c757d;
+  color: var(--muted-foreground);
   padding-bottom: 0.75rem;
   margin: 1rem 0;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--border);
 }
 .projection-card .total-projection .amount {
   font-weight: 700;
   font-size: 1.2rem;
-  color: #343a40;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
 }
 
 .projection-list {
@@ -106,6 +139,7 @@
 }
 .projection-item .amount {
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Card de Histórico */
@@ -118,7 +152,7 @@
   justify-content: space-between;
   align-items: center;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--border);
 }
 
 .transaction-table {
@@ -127,28 +161,19 @@
   flex-grow: 1; /* Faz a tabela ocupar o espaço disponível */
 }
 
-.chart-container {
-  width: 100%;
-  max-width: 400px;
-  margin: auto;
-}
-canvas {
-  width: 100% !important;
-  height: auto !important;
-}
-
 .transaction-table th,
 .transaction-table td {
   padding: 0.75rem;
   text-align: left;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border);
 }
 
 .transaction-table thead th {
   font-weight: 600;
-  font-size: 0.8rem;
-  color: #6c757d;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
   text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 .transaction-table tbody tr:last-child td {
   border-bottom: none;
@@ -160,26 +185,28 @@ canvas {
 .transaction-table .description {
   display: block;
   font-weight: 500;
+  color: var(--foreground);
 }
 .transaction-table .date {
   font-size: 0.8rem;
-  color: #6c757d;
+  color: var(--muted-foreground);
 }
 
 .transaction-table .transaction-value {
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 .transaction-table tr.income .transaction-value {
-  color: #198754;
+  color: var(--income);
 }
 .transaction-table tr.expense .transaction-value {
-  color: #dc3545;
+  color: var(--expense);
 }
 
 .no-items {
   text-align: center;
   padding: 2rem;
-  color: #adb5bd;
+  color: var(--muted-foreground);
 }
 
 /* Controles de Paginação */
@@ -193,16 +220,24 @@ canvas {
 }
 .items-per-page-select {
   padding: 0.4rem;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   font-size: 0.8rem;
+  background-color: var(--card);
+  color: var(--foreground);
 }
 .pagination-controls button {
   padding: 0.4rem 0.8rem;
-  border: 1px solid #dee2e6;
-  background-color: white;
-  border-radius: 6px;
+  border: 1px solid var(--border);
+  background-color: var(--card);
+  border-radius: var(--radius);
   cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+.pagination-controls button:hover:not(:disabled) {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
 }
 .pagination-controls button:disabled {
   cursor: not-allowed;
@@ -210,20 +245,7 @@ canvas {
 }
 .pagination-controls span {
   font-size: 0.9rem;
-  color: #6c757d;
-}
-
-.chart-card {
-  padding: 1rem;
-  height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.chart-card canvas {
-  max-width: 100%;
-  max-height: 100%;
+  color: var(--muted-foreground);
 }
 
 /* ARQUIVO: src/app/components/reports/reports.css */
@@ -242,19 +264,20 @@ canvas {
 .transaction-icon {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
 }
 
 .transaction-icon.income {
-  background-color: #2ecc71;
+  background-color: var(--income-bg);
+  color: var(--income);
 }
 
 .transaction-icon.expense {
-  background-color: #e74c3c;
+  background-color: var(--expense-bg);
+  color: var(--expense);
 }
 
 .action-buttons-wrapper {
@@ -264,29 +287,27 @@ canvas {
 }
 
 .action-btn {
-  background: #f0f3f5;
+  background: var(--secondary);
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   width: 36px;
   height: 36px;
   cursor: pointer;
-  color: #7f8c8d;
+  color: var(--muted-foreground);
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.action-btn:hover {
-  color: #fff;
-}
-
 .action-btn.edit-btn:hover {
-  background-color: #3498db; /* Azul no hover */
+  background-color: var(--accent);
+  color: var(--accent-foreground);
 }
 
 .action-btn.delete-btn:hover {
-  background-color: #e74c3c; /* Vermelho no hover */
+  background-color: var(--expense-bg);
+  color: var(--destructive);
 }
 
 .table-scroll {
@@ -306,8 +327,12 @@ canvas {
   :host {
     padding: 1rem;
   }
-  .chart-card {
+  .balance-chart-container {
     height: 260px;
+  }
+  .card-header {
+    flex-wrap: wrap;
+    gap: 0.75rem;
   }
   .history-card .section-header {
     flex-wrap: wrap;

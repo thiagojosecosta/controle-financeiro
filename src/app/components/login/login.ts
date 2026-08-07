@@ -6,6 +6,7 @@ import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-login',
@@ -17,13 +18,21 @@ import { NotificationService } from '../../services/notification.service';
 export class LoginComponent implements OnInit {
   credentials = { email: '', pass: '' };
   showPassword = false;
+  theme;
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private notificationService: NotificationService,
-    private route: ActivatedRoute // Injeta o serviço para ler a URL
-  ) {}
+    private route: ActivatedRoute, // Injeta o serviço para ler a URL
+    private themeService: ThemeService
+  ) {
+    this.theme = this.themeService.theme;
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggle();
+  }
 
   ngOnInit(): void {
     // ESTE BLOCO É O RESPONSÁVEL POR LER O AVISO

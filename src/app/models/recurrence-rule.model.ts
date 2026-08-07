@@ -14,4 +14,6 @@ export interface RecurrenceRule {
   installments?: number | null;
 
   isActive: boolean;
+
+  categoryId?: string | null;
 }

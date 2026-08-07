@@ -11,4 +11,6 @@ export interface Transaction {
 
   // PROPRIEDADE ADICIONADA: Opcional, para sabermos a origem da transação
   sourceRuleId?: string;
+
+  categoryId?: string | null;
 }

@@ -4,22 +4,22 @@
     <p>Uma visão clara das suas finanças.</p>
   </div>
 
-  <div class="row">
-    <div class="card chart-card">
-      <div class="card-header">
-        <h3>Receitas vs. Despesas (Mês Atual)</h3>
-      </div>
-      <div class="chart-container">
-        <canvas #incomeExpenseChart></canvas>
+  <div class="card balance-chart-card">
+    <div class="card-header">
+      <h3>Evolução do Saldo</h3>
+      <div class="period-selector">
+        <button
+          *ngFor="let opt of periodOptions"
+          class="period-btn"
+          [class.active]="selectedPeriod === opt.value"
+          (click)="onPeriodChange(opt.value)"
+        >
+          {{ opt.label }}
+        </button>
       </div>
     </div>
-    <div class="card chart-card">
-      <div class="card-header">
-        <h3>Projeção para o Próximo Mês</h3>
-      </div>
-      <div class="chart-container">
-        <canvas #nextMonthChart></canvas>
-      </div>
+    <div class="balance-chart-container">
+      <canvas #balanceChart></canvas>
     </div>
   </div>
 
@@ -102,8 +102,8 @@
             </td>
             <td class="text-right transaction-value">
               <span *ngIf="isBalanceVisible">{{
-                transaction.value | currency : "BRL"
-              }}</span>
+                transaction.type === "income" ? "+" : "−"
+              }}{{ transaction.value | currency : "BRL" }}</span>
               <span *ngIf="!isBalanceVisible">R$ ••••••</span>
             </td>
             <td class="text-right">

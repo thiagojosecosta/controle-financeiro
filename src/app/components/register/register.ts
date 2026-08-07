@@ -12,6 +12,7 @@ import {
 } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../models/user.model';
+import { ThemeService } from '../../services/theme.service';
 
 // Função validadora customizada
 export function senhasCoincidemValidator(control: AbstractControl) {
@@ -31,12 +32,20 @@ export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;
   showPassword = false;
   showConfirmPassword = false;
+  theme;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private themeService: ThemeService
+  ) {
+    this.theme = this.themeService.theme;
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggle();
+  }
 
   ngOnInit(): void {
     this.registerForm = this.fb.group(

@@ -1,4 +1,12 @@
 <div class="register-container">
+  <button
+    type="button"
+    class="theme-toggle-btn"
+    (click)="toggleTheme()"
+    title="Alternar tema"
+  >
+    <i class="fas" [ngClass]="theme() === 'dark' ? 'fa-sun' : 'fa-moon'"></i>
+  </button>
   <div class="register-box">
     <h2>Criar Conta</h2>
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
@@ -12,7 +20,8 @@
         "
         class="error-message"
       >
-        O nome completo é obrigatório.
+        <i class="fas fa-circle-exclamation"></i>
+        <span>O nome completo é obrigatório.</span>
       </div>
 
       <div class="input-group">
@@ -26,6 +35,7 @@
         "
         class="error-message"
       >
+        <i class="fas fa-circle-exclamation"></i>
         <span *ngIf="registerForm.get('email')?.errors?.['required']"
           >O e-mail é obrigatório.</span
         >
@@ -54,6 +64,7 @@
         "
         class="error-message"
       >
+        <i class="fas fa-circle-exclamation"></i>
         <span *ngIf="registerForm.get('senha')?.errors?.['required']"
           >A senha é obrigatória.</span
         >
@@ -82,7 +93,8 @@
         *ngIf="registerForm.errors?.['naoCoincidem'] && registerForm.get('confirmarSenha')?.touched"
         class="error-message"
       >
-        As senhas não coincidem.
+        <i class="fas fa-circle-exclamation"></i>
+        <span>As senhas não coincidem.</span>
       </div>
 
       <button type="submit" class="btn-register">Criar Conta</button>

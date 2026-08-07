@@ -1,4 +1,20 @@
 <div class="login-container">
+  <button
+    type="button"
+    class="theme-toggle-btn"
+    (click)="toggleTheme()"
+    title="Alternar tema"
+  >
+    <i class="fas" [ngClass]="theme() === 'dark' ? 'fa-sun' : 'fa-moon'"></i>
+  </button>
+  <div class="brand-header">
+    <span class="brand-icon">$</span>
+    <h1 class="brand-name">EasyMoney</h1>
+    <p class="brand-tagline">
+      Gerencie suas receitas e despesas em um só lugar, de forma simples e
+      intuitiva.
+    </p>
+  </div>
   <div class="login-box">
     <h2>Acessar Sistema</h2>
     <form (ngSubmit)="onSubmit()">

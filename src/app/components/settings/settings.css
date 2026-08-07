@@ -3,7 +3,7 @@
 :host {
   display: block;
   padding: 2rem;
-  background-color: #f4f7fa;
+  background-color: var(--background);
 }
 
 .settings-container {
@@ -19,29 +19,75 @@
 }
 .header h1 {
   margin: 0;
-  font-size: 1.8rem;
-  color: #343a40;
+  font-size: 1.5rem;
+  color: var(--foreground);
 }
 .header p {
   margin-top: 0.25rem;
-  color: #6c757d;
+  color: var(--muted-foreground);
 }
 
 .card {
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
+  scroll-margin-top: 1.5rem;
 }
+.profile-hero {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.75rem 1.5rem;
+  background: linear-gradient(135deg, var(--accent), var(--card) 130%);
+  border-bottom: 1px solid var(--border);
+}
+.profile-avatar {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-md);
+}
+.profile-hero-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.profile-hero-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.profile-hero-email {
+  font-size: 0.85rem;
+  color: var(--muted-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .card-header {
   padding: 1rem 1.5rem;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
+  background-color: var(--card);
+  border-bottom: 1px solid var(--border);
 }
 .card-header h3 {
   margin: 0;
-  font-size: 1.1rem;
-  color: #343a40;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--foreground);
 }
 .card-body {
   padding: 1.5rem;
@@ -52,28 +98,30 @@
 }
 .form-group label {
   display: block;
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: 0.5rem;
-  color: #495057;
-  font-size: 0.9rem;
+  color: var(--foreground);
+  font-size: 0.85rem;
 }
 
 .form-control {
   width: 100%;
   padding: 0.75rem 1rem;
   font-size: 1rem;
-  border: 1px solid #ced4da;
-  border-radius: 8px;
+  color: var(--foreground);
+  background-color: var(--card);
+  border: 1px solid var(--input);
+  border-radius: var(--radius);
   transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
 }
 .form-control:focus {
-  border-color: #80bdff;
+  border-color: var(--ring);
   outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.2);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 .form-control[readonly] {
-  background-color: #e9ecef;
+  background-color: var(--secondary);
   cursor: not-allowed;
 }
 
@@ -90,7 +138,7 @@
   position: absolute;
   right: 1rem;
   cursor: pointer;
-  color: #adb5bd;
+  color: var(--muted-foreground);
 }
 /* --- FIM DOS NOVOS ESTILOS --- */
 
@@ -102,25 +150,26 @@
 
 /* --- ESTILO DOS BOTÕES ATUALIZADO --- */
 .btn-primary {
-  background-color: #3498db;
-  color: white;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
   border: none;
   padding: 0.8rem 1.5rem;
-  border-radius: 8px;
+  border-radius: var(--radius);
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 .btn-primary:hover:not(:disabled) {
-  background-color: #2980b9;
+  background-color: var(--primary-hover);
 }
 .btn-primary:disabled {
-  background-color: #bdc3c7;
+  background-color: var(--secondary);
+  color: var(--muted-foreground);
   cursor: not-allowed;
 }
 
 .error-message {
-  color: #dc3545;
+  color: var(--destructive);
   font-size: 0.8rem;
   margin-top: 0.25rem;
 }

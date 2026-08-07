@@ -1,0 +1,37 @@
+<div class="date-picker">
+  <button type="button" class="date-picker-trigger" (click)="toggle()">
+    <i class="fas fa-calendar-day"></i>
+    <span [class.placeholder]="!value">{{ displayLabel }}</span>
+  </button>
+
+  <div class="date-picker-popover" *ngIf="isOpen">
+    <div class="date-picker-header">
+      <button type="button" class="date-picker-nav-btn" (click)="prevMonth()">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <span class="date-picker-month-label">{{ monthLabel }}</span>
+      <button type="button" class="date-picker-nav-btn" (click)="nextMonth()">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <div class="date-picker-weekdays">
+      <span *ngFor="let w of weekdayLabels">{{ w }}</span>
+    </div>
+
+    <div class="date-picker-grid">
+      <button
+        type="button"
+        *ngFor="let day of calendarCells"
+        class="date-picker-day"
+        [class.empty]="day === null"
+        [class.selected]="isSelected(day)"
+        [class.today]="isToday(day) && !isSelected(day)"
+        [disabled]="day === null"
+        (click)="selectDay(day)"
+      >
+        {{ day }}
+      </button>
+    </div>
+  </div>
+</div>

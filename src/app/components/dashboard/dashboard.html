@@ -1,4 +1,7 @@
-<div class="dashboard-container" [class.sidebar-collapsed]="isSidebarCollapsed">
+<div
+  class="dashboard-container"
+  [class.sidebar-collapsed]="isSidebarCollapsed"
+>
   <div
     class="sidebar-backdrop"
     *ngIf="!isSidebarCollapsed"
@@ -11,12 +14,24 @@
         <span class="title-text">Controle$</span>
       </a>
     </div>
+    <div class="sidebar-toolbar">
+      <div class="sidebar-search">
+        <i class="fas fa-search"></i>
+        <input
+          type="text"
+          placeholder="Buscar transações..."
+          [(ngModel)]="searchQuery"
+          (keyup.enter)="onSearch(searchQuery)"
+        />
+      </div>
+    </div>
     <nav class="sidebar-nav">
       <a
         routerLink="/dashboard/home"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
         class="nav-item"
+        (click)="onNavClick()"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -38,6 +53,7 @@
         routerLink="/dashboard/transactions"
         routerLinkActive="active"
         class="nav-item"
+        (click)="onNavClick()"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -56,9 +72,57 @@
         <span>Transações</span>
       </a>
       <a
+        routerLink="/dashboard/categories"
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="onNavClick()"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M20.59 13.41 11 3.83 3.83 11l9.58 9.59a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.83z"
+          ></path>
+          <circle cx="7.5" cy="7.5" r="1.5"></circle>
+        </svg>
+        <span>Categorias</span>
+      </a>
+      <a
+        routerLink="/dashboard/goals"
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="onNavClick()"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="10"></circle>
+          <circle cx="12" cy="12" r="6"></circle>
+          <circle cx="12" cy="12" r="2"></circle>
+        </svg>
+        <span>Metas</span>
+      </a>
+      <a
         routerLink="/dashboard/reports"
         routerLinkActive="active"
         class="nav-item"
+        (click)="onNavClick()"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -80,6 +144,7 @@
         routerLink="/dashboard/settings"
         routerLinkActive="active"
         class="nav-item"
+        (click)="onNavClick()"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -101,31 +166,51 @@
       </a>
     </nav>
     <div class="sidebar-footer">
-      <a (click)="logout()" class="nav-item" style="cursor: pointer">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-          <polyline points="16 17 21 12 16 7"></polyline>
-          <line x1="21" y1="12" x2="9" y2="12"></line>
-        </svg>
-        <span>Sair</span>
-      </a>
+      <div class="user-menu">
+        <button class="user-menu-trigger" (click)="toggleUserMenu()">
+          <span class="user-avatar">{{ userInitial() }}</span>
+          <span class="user-info">
+            <span class="user-name">{{ userName() }}</span>
+            <span class="user-email">{{ userEmail() }}</span>
+          </span>
+          <i class="fas fa-chevron-up user-menu-chevron"></i>
+        </button>
+        <div class="user-dropdown" *ngIf="isUserMenuOpen">
+          <a
+            routerLink="/dashboard/settings"
+            class="dropdown-item"
+            (click)="isUserMenuOpen = false; onNavClick()"
+          >
+            <i class="fas fa-user-pen"></i>
+            <span>Editar Perfil</span>
+          </a>
+          <a
+            routerLink="/dashboard/settings"
+            [queryParams]="{ section: 'password' }"
+            class="dropdown-item"
+            (click)="isUserMenuOpen = false; onNavClick()"
+          >
+            <i class="fas fa-key"></i>
+            <span>Alterar Senha</span>
+          </a>
+          <button class="dropdown-item danger" (click)="logout()">
+            <i class="fas fa-arrow-right-from-bracket"></i>
+            <span>Sair</span>
+          </button>
+        </div>
+      </div>
     </div>
   </aside>
 
   <main class="main-content">
     <header class="main-header">
       <div class="header-left">
-        <button class="hamburger-btn" (click)="toggleSidebar()">
+        <button
+          class="hamburger-btn"
+          [class.is-open]="!isSidebarCollapsed"
+          (click)="toggleSidebar()"
+          title="Abrir/fechar menu"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -137,15 +222,28 @@
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
+            <line class="bar bar-top" x1="3" y1="6" x2="21" y2="6"></line>
+            <line class="bar bar-middle" x1="3" y1="12" x2="21" y2="12"></line>
+            <line class="bar bar-bottom" x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </button>
-        <h1>Olá, {{ userName() }}!</h1>
+      </div>
+      <div class="header-right">
+        <button
+          class="theme-toggle-btn"
+          (click)="toggleTheme()"
+          title="Alternar tema"
+        >
+          <i
+            class="fas"
+            [ngClass]="theme() === 'dark' ? 'fa-sun' : 'fa-moon'"
+          ></i>
+        </button>
       </div>
     </header>
 
-    <router-outlet></router-outlet>
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
   </main>
 </div>

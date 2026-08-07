@@ -1,0 +1,330 @@
+<div class="categories-container">
+  <div class="header">
+    <h1>Categorias</h1>
+    <p>Organize suas transações em grupos e categorias, e defina orçamentos mensais.</p>
+  </div>
+
+  <!-- Grupos -->
+  <div class="card">
+    <div class="card-header card-header-actions">
+      <h3>Grupos</h3>
+      <button class="btn-add-inline" (click)="openNewGroupForm()" *ngIf="!isGroupFormOpen">
+        <i class="fas fa-plus"></i> Adicionar Grupo
+      </button>
+    </div>
+    <div class="card-body">
+      <ul class="group-manage-list" *ngIf="groups.length > 0">
+        <li class="group-manage-item" *ngFor="let group of groups">
+          <span
+            class="icon-chip"
+            [style.background]="group.color + '1A'"
+            [style.color]="group.color"
+          >
+            <i class="fas" [ngClass]="group.icon"></i>
+          </span>
+          <span class="group-manage-name">{{ group.name }}</span>
+          <span class="group-manage-count"
+            >{{ categoriesForGroup(group.id).length }} categoria(s)</span
+          >
+          <button
+            class="action-btn edit-btn"
+            title="Editar grupo"
+            (click)="startEditGroup(group)"
+          >
+            <i class="fas fa-pencil-alt"></i>
+          </button>
+          <button
+            class="action-btn delete-btn"
+            title="Excluir grupo"
+            (click)="deleteGroup(group.id)"
+          >
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </li>
+      </ul>
+
+      <form
+        class="category-form"
+        [formGroup]="groupForm"
+        (ngSubmit)="saveGroup()"
+        *ngIf="isGroupFormOpen"
+      >
+        <h4 class="form-subtitle">
+          {{ editingGroupId ? "Editar grupo" : "Novo grupo" }}
+        </h4>
+        <div class="form-group">
+          <label for="groupName">Nome</label>
+          <input
+            id="groupName"
+            type="text"
+            formControlName="name"
+            class="form-control"
+            placeholder="Ex: Essenciais"
+          />
+        </div>
+        <div class="form-group">
+          <label>Cor</label>
+          <div class="swatch-row">
+            <button
+              type="button"
+              *ngFor="let color of groupColorOptions"
+              class="swatch"
+              [class.selected]="groupForm.get('color')?.value === color"
+              [style.background]="color"
+              (click)="groupForm.patchValue({ color })"
+            ></button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Ícone</label>
+          <div class="icon-row">
+            <button
+              type="button"
+              *ngFor="let icon of groupIconOptions"
+              class="icon-option"
+              [class.selected]="groupForm.get('icon')?.value === icon"
+              (click)="groupForm.patchValue({ icon })"
+            >
+              <i class="fas" [ngClass]="icon"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="cancelEditGroup()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="groupForm.invalid">
+            {{ editingGroupId ? "Salvar Alterações" : "Adicionar Grupo" }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Categorias -->
+  <div class="card">
+    <div class="card-header card-header-actions">
+      <h3>Suas Categorias</h3>
+      <button class="btn-add-inline" (click)="openNewCategoryForm()" *ngIf="!isCategoryFormOpen">
+        <i class="fas fa-plus"></i> Adicionar Categoria
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="category-groups" *ngIf="categories.length > 0">
+        <div class="category-group-section" *ngFor="let group of groups">
+          <button
+            type="button"
+            class="group-section-header"
+            (click)="toggleGroupCollapsed(group.id)"
+          >
+            <i
+              class="fas chevron"
+              [ngClass]="isGroupCollapsed(group.id) ? 'fa-chevron-right' : 'fa-chevron-down'"
+            ></i>
+            <span
+              class="icon-chip"
+              [style.background]="group.color + '1A'"
+              [style.color]="group.color"
+            >
+              <i class="fas" [ngClass]="group.icon"></i>
+            </span>
+            <span class="group-section-name">{{ group.name }}</span>
+            <span class="group-section-count"
+              >{{ categoriesForGroup(group.id).length }}</span
+            >
+          </button>
+
+          <ul class="category-manage-list" *ngIf="!isGroupCollapsed(group.id) && categoriesForGroup(group.id).length > 0">
+            <li class="category-manage-item" *ngFor="let cat of categoriesForGroup(group.id)">
+              <span
+                class="icon-chip"
+                [style.background]="cat.color + '1A'"
+                [style.color]="cat.color"
+              >
+                <i class="fas" [ngClass]="cat.icon"></i>
+              </span>
+              <span class="category-manage-name">{{ cat.name }}</span>
+              <span class="category-manage-type">{{
+                cat.type === "income" ? "Receita" : "Despesa"
+              }}</span>
+              <button
+                class="action-btn edit-btn"
+                title="Editar categoria"
+                (click)="startEdit(cat)"
+              >
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+              <button
+                class="action-btn delete-btn"
+                title="Excluir categoria"
+                (click)="deleteCategory(cat.id)"
+              >
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <div class="category-group-section" *ngIf="ungroupedCategories.length > 0">
+          <button
+            type="button"
+            class="group-section-header"
+            (click)="toggleGroupCollapsed('__ungrouped__')"
+          >
+            <i
+              class="fas chevron"
+              [ngClass]="isGroupCollapsed('__ungrouped__') ? 'fa-chevron-right' : 'fa-chevron-down'"
+            ></i>
+            <span class="icon-chip" style="background: #64748B1A; color: #64748B">
+              <i class="fas fa-ellipsis"></i>
+            </span>
+            <span class="group-section-name">Sem grupo</span>
+            <span class="group-section-count">{{ ungroupedCategories.length }}</span>
+          </button>
+
+          <ul class="category-manage-list" *ngIf="!isGroupCollapsed('__ungrouped__')">
+            <li class="category-manage-item" *ngFor="let cat of ungroupedCategories">
+              <span
+                class="icon-chip"
+                [style.background]="cat.color + '1A'"
+                [style.color]="cat.color"
+              >
+                <i class="fas" [ngClass]="cat.icon"></i>
+              </span>
+              <span class="category-manage-name">{{ cat.name }}</span>
+              <span class="category-manage-type">{{
+                cat.type === "income" ? "Receita" : "Despesa"
+              }}</span>
+              <button
+                class="action-btn edit-btn"
+                title="Editar categoria"
+                (click)="startEdit(cat)"
+              >
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+              <button
+                class="action-btn delete-btn"
+                title="Excluir categoria"
+                (click)="deleteCategory(cat.id)"
+              >
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <form
+        class="category-form"
+        [formGroup]="categoryForm"
+        (ngSubmit)="saveCategory()"
+        *ngIf="isCategoryFormOpen"
+      >
+        <h4 class="form-subtitle">
+          {{ editingCategoryId ? "Editar categoria" : "Nova categoria" }}
+        </h4>
+        <div class="form-group">
+          <label for="catName">Nome</label>
+          <input
+            id="catName"
+            type="text"
+            formControlName="name"
+            class="form-control"
+            placeholder="Ex: Educação"
+          />
+        </div>
+        <div class="form-group">
+          <label>Tipo</label>
+          <div class="type-selection">
+            <label
+              ><input type="radio" formControlName="type" value="income" />
+              Receita</label
+            >
+            <label
+              ><input type="radio" formControlName="type" value="expense" />
+              Despesa</label
+            >
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="catGroup">Grupo</label>
+          <select id="catGroup" formControlName="groupId" class="form-control">
+            <option [ngValue]="null">Sem grupo</option>
+            <option *ngFor="let group of groups" [ngValue]="group.id">
+              {{ group.name }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Cor</label>
+          <div class="swatch-row">
+            <button
+              type="button"
+              *ngFor="let color of colorOptions"
+              class="swatch"
+              [class.selected]="categoryForm.get('color')?.value === color"
+              [style.background]="color"
+              (click)="categoryForm.patchValue({ color })"
+            ></button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Ícone</label>
+          <div class="icon-row">
+            <button
+              type="button"
+              *ngFor="let icon of iconOptions"
+              class="icon-option"
+              [class.selected]="categoryForm.get('icon')?.value === icon"
+              (click)="categoryForm.patchValue({ icon })"
+            >
+              <i class="fas" [ngClass]="icon"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="cancelEdit()">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="categoryForm.invalid"
+          >
+            {{ editingCategoryId ? "Salvar Alterações" : "Adicionar Categoria" }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h3>Orçamento Mensal</h3></div>
+    <div class="card-body">
+      <p class="budget-hint">
+        Defina um limite mensal por categoria de despesa para acompanhar o
+        progresso no painel.
+      </p>
+      <div class="budget-row" *ngFor="let cat of expenseCategories">
+        <span
+          class="icon-chip"
+          [style.background]="cat.color + '1A'"
+          [style.color]="cat.color"
+        >
+          <i class="fas" [ngClass]="cat.icon"></i>
+        </span>
+        <span class="budget-name">{{ cat.name }}</span>
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          class="form-control budget-input"
+          placeholder="R$ 0,00"
+          [(ngModel)]="budgetAmounts[cat.id]"
+          [ngModelOptions]="{ standalone: true }"
+          (blur)="saveBudget(cat.id)"
+        />
+      </div>
+    </div>
+  </div>
+</div>

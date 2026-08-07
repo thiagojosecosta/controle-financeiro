@@ -1,0 +1,226 @@
+<div class="goals-container">
+  <div class="header">
+    <div>
+      <h1>Metas</h1>
+      <p>Defina objetivos financeiros e acompanhe seu progresso.</p>
+    </div>
+    <button class="btn-primary add-goal-btn" (click)="openNewGoalForm()">
+      <i class="fas fa-plus"></i>
+      <span>Adicionar Objetivo</span>
+    </button>
+  </div>
+
+  <div class="tabs">
+    <button
+      *ngFor="let tab of tabs"
+      class="tab-btn"
+      [class.active]="activeTab === tab.key"
+      (click)="activeTab = tab.key"
+    >
+      {{ tab.label }}
+      <span class="tab-count">{{ countForTab(tab.key) }}</span>
+    </button>
+  </div>
+
+  <div class="goals-grid" *ngIf="filteredGoals.length > 0; else emptyState">
+    <div class="goal-card" *ngFor="let goal of filteredGoals">
+      <div class="goal-card-header">
+        <span
+          class="goal-icon"
+          [style.background]="goal.color + '1A'"
+          [style.color]="goal.color"
+        >
+          <i class="fas" [ngClass]="goal.icon"></i>
+        </span>
+        <div class="goal-title-block">
+          <span class="goal-name">{{ goal.name }}</span>
+          <span class="goal-date" *ngIf="formatTargetDate(goal) as dateLabel">
+            <i class="fas fa-calendar-day"></i> {{ dateLabel }}
+          </span>
+        </div>
+        <span
+          class="goal-status-badge"
+          [ngClass]="goal.status"
+          *ngIf="goal.status !== 'active'"
+        >
+          {{
+            goal.status === "completed"
+              ? "Concluída"
+              : goal.status === "paused"
+              ? "Em pausa"
+              : "Arquivada"
+          }}
+        </span>
+      </div>
+
+      <div class="goal-amounts tabular-nums">
+        <span class="current-amount">{{ goal.currentAmount | currency : "BRL" }}</span>
+        <span class="target-amount">de {{ goal.targetAmount | currency : "BRL" }}</span>
+      </div>
+
+      <div class="progress-bar">
+        <div
+          class="progress-fill"
+          [class.completed]="goal.status === 'completed'"
+          [style.width.%]="progressPercent(goal)"
+          [style.background]="goal.status === 'completed' ? 'var(--income)' : goal.color"
+        ></div>
+      </div>
+      <span class="progress-percent-label">{{ progressLabel(goal) }}</span>
+
+      <div class="goal-progress-update" *ngIf="editingProgressId === goal.id">
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          class="form-control progress-input"
+          [(ngModel)]="progressAmounts[goal.id]"
+          [ngModelOptions]="{ standalone: true }"
+          placeholder="Novo valor atual"
+        />
+        <button class="btn-secondary btn-sm" (click)="cancelEditProgress()">Cancelar</button>
+        <button class="btn-primary btn-sm" (click)="saveProgress(goal.id)">Salvar</button>
+      </div>
+
+      <div class="goal-actions" *ngIf="editingProgressId !== goal.id">
+        <button
+          class="action-btn"
+          title="Atualizar progresso"
+          (click)="startEditProgress(goal)"
+        >
+          <i class="fas fa-chart-line"></i>
+        </button>
+        <button class="action-btn" title="Editar meta" (click)="startEdit(goal)">
+          <i class="fas fa-pencil-alt"></i>
+        </button>
+        <button
+          class="action-btn"
+          title="Pausar"
+          *ngIf="goal.status === 'active'"
+          (click)="pauseGoal(goal)"
+        >
+          <i class="fas fa-pause"></i>
+        </button>
+        <button
+          class="action-btn"
+          title="Retomar"
+          *ngIf="goal.status === 'paused'"
+          (click)="resumeGoal(goal)"
+        >
+          <i class="fas fa-play"></i>
+        </button>
+        <button
+          class="action-btn"
+          title="Arquivar"
+          *ngIf="goal.status !== 'archived'"
+          (click)="archiveGoal(goal)"
+        >
+          <i class="fas fa-box-archive"></i>
+        </button>
+        <button
+          class="action-btn delete-btn"
+          title="Excluir meta"
+          (click)="deleteGoal(goal.id)"
+        >
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #emptyState>
+    <div class="empty-state">
+      <i class="fas fa-bullseye"></i>
+      <p>Ainda não tem objetivos?</p>
+      <span>Crie seu primeiro objetivo para começar a acompanhar!</span>
+      <button class="btn-primary" (click)="openNewGoalForm()">
+        <i class="fas fa-plus"></i>
+        <span>Adicionar Objetivo</span>
+      </button>
+    </div>
+  </ng-template>
+</div>
+
+<div class="popup-overlay" *ngIf="isFormOpen" (click)="cancelEdit()">
+  <div class="popup-container" (click)="$event.stopPropagation()">
+    <h3>{{ editingGoalId ? "Editar Meta" : "Nova Meta" }}</h3>
+
+    <form [formGroup]="goalForm" (ngSubmit)="saveGoal()">
+      <div class="form-group">
+        <label for="goalName">Nome</label>
+        <input
+          id="goalName"
+          type="text"
+          formControlName="name"
+          class="form-control"
+          placeholder="Ex: Viagem para a praia"
+        />
+      </div>
+      <div class="form-group">
+        <label for="targetAmount">Valor-alvo</label>
+        <input
+          id="targetAmount"
+          type="tel"
+          formControlName="targetAmount"
+          class="form-control"
+          placeholder="R$ 0,00"
+          appCurrencyMask
+        />
+      </div>
+      <div class="form-group">
+        <label for="currentAmount">Valor atual</label>
+        <input
+          id="currentAmount"
+          type="tel"
+          formControlName="currentAmount"
+          class="form-control"
+          placeholder="R$ 0,00"
+          appCurrencyMask
+        />
+      </div>
+      <div class="form-group">
+        <label>Data-alvo (opcional)</label>
+        <app-date-picker
+          [value]="goalForm.get('targetDate')?.value"
+          placeholder="Sem data definida"
+          (valueChange)="goalForm.patchValue({ targetDate: $event })"
+        ></app-date-picker>
+      </div>
+      <div class="form-group">
+        <label>Cor</label>
+        <div class="swatch-row">
+          <button
+            type="button"
+            *ngFor="let color of colorOptions"
+            class="swatch"
+            [class.selected]="goalForm.get('color')?.value === color"
+            [style.background]="color"
+            (click)="goalForm.patchValue({ color })"
+          ></button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Ícone</label>
+        <div class="icon-row">
+          <button
+            type="button"
+            *ngFor="let icon of iconOptions"
+            class="icon-option"
+            [class.selected]="goalForm.get('icon')?.value === icon"
+            (click)="goalForm.patchValue({ icon })"
+          >
+            <i class="fas" [ngClass]="icon"></i>
+          </button>
+        </div>
+      </div>
+      <div class="popup-actions">
+        <button type="button" class="btn-secondary" (click)="cancelEdit()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="goalForm.invalid">
+          {{ editingGoalId ? "Salvar Alterações" : "Criar Meta" }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

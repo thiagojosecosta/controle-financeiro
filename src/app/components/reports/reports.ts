@@ -7,6 +7,7 @@ import {
   ElementRef,
   ViewChild,
   AfterViewInit,
+  effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +16,7 @@ import { Transaction } from '../../models/transaction';
 import { FinanceService } from '../../services/finance.service';
 import { TransactionService } from '../../services/transaction.service';
 import { NotificationService } from '../../services/notification.service';
+import { ThemeService } from '../../services/theme.service';
 import { TransactionsComponent } from '../transactions/transactions'; // Importar
 import { getDatePart, isSameOrBeforeDay } from '../../utils/date.util';
 
@@ -28,9 +30,8 @@ Chart.register(...registerables);
   styleUrls: ['./reports.css'],
 })
 export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
-  // Referências para os <canvas> no HTML
-  @ViewChild('incomeExpenseChart') private incomeExpenseChartRef!: ElementRef;
-  @ViewChild('nextMonthChart') private nextMonthChartRef!: ElementRef;
+  // Referência para o <canvas> no HTML
+  @ViewChild('balanceChart') private balanceChartRef!: ElementRef;
 
   allTransactions: Transaction[] = [];
   transactionHistory: Transaction[] = []; // Lista apenas com transações passadas
@@ -44,9 +45,14 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
   currentPage = 1;
   totalPages = 1;
 
-  // Variáveis para os gráficos
-  incomeExpenseChart: Chart | undefined;
-  nextMonthChart: Chart | undefined;
+  // Gráfico de evolução do saldo
+  balanceChart: Chart | undefined;
+  selectedPeriod = 12;
+  periodOptions = [
+    { label: '6M', value: 6 },
+    { label: '1 ano', value: 12 },
+    { label: '2 anos', value: 24 },
+  ];
 
   // Para controlar o modal de edição
   isModalOpen = false;
@@ -54,21 +60,29 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private financeService: FinanceService,
     private transactionService: TransactionService,
-    private notificationService: NotificationService
-  ) {}
+    private notificationService: NotificationService,
+    private themeService: ThemeService
+  ) {
+    // Redesenha o gráfico com as cores certas quando o tema muda em tempo real.
+    effect(() => {
+      this.themeService.theme();
+      if (this.balanceChart) {
+        this.createBalanceChart();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.loadReportData();
   }
 
   ngAfterViewInit(): void {
-    // A criação dos gráficos deve ocorrer depois da view ser inicializada
-    this.createCharts();
+    // A criação do gráfico deve ocorrer depois da view ser inicializada
+    this.createBalanceChart();
   }
 
   ngOnDestroy(): void {
-    this.incomeExpenseChart?.destroy();
-    this.nextMonthChart?.destroy();
+    this.balanceChart?.destroy();
   }
 
   loadReportData(): void {
@@ -84,69 +98,68 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
     this.calculateProjections();
     this.updatePagination();
 
-    if (this.incomeExpenseChart || this.nextMonthChart) {
-      this.createCharts();
+    if (this.balanceChart) {
+      this.createBalanceChart();
     }
   }
 
-  createCharts(): void {
-    this.destroyCharts(); // Garante que gráficos antigos sejam destruídos
+  onPeriodChange(months: number): void {
+    this.selectedPeriod = months;
+    this.createBalanceChart();
+  }
 
-    const today = new Date();
-    const summaryCurrentMonth = this.financeService.getMonthlySummary(today);
-    this.incomeExpenseChart = new Chart(
-      this.incomeExpenseChartRef.nativeElement,
-      {
-        type: 'doughnut',
-        data: {
-          labels: ['Receitas', 'Despesas'],
-          datasets: [
-            {
-              data: [summaryCurrentMonth.income, summaryCurrentMonth.expense],
-              backgroundColor: ['#2ecc71', '#e74c3c'],
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { position: 'top' } },
-        },
-      }
-    );
+  createBalanceChart(): void {
+    this.balanceChart?.destroy();
 
-    // Gráfico 2: Despesas Previstas para o Próximo Mês
-    const nextMonthDate = new Date(
-      today.getFullYear(),
-      today.getMonth() + 1,
-      1
-    );
+    const history = this.financeService.getBalanceHistory(this.selectedPeriod);
 
-    const summaryNextMonth =
-      this.financeService.getMonthlySummary(nextMonthDate);
+    const styles = getComputedStyle(document.documentElement);
+    const primary = styles.getPropertyValue('--primary').trim() || '#6366F1';
+    const mutedForeground =
+      styles.getPropertyValue('--muted-foreground').trim() || '#64748B';
+    const border = styles.getPropertyValue('--border').trim() || '#E8ECF1';
 
-    this.nextMonthChart = new Chart(this.nextMonthChartRef.nativeElement, {
-      type: 'doughnut',
+    this.balanceChart = new Chart(this.balanceChartRef.nativeElement, {
+      type: 'line',
       data: {
-        labels: ['Receitas Previstas', 'Despesas Previstas'],
+        labels: history.map((p) => p.label),
         datasets: [
           {
-            data: [summaryNextMonth.income, summaryNextMonth.expense],
-            backgroundColor: ['#2ecc71', '#e74c3c'],
+            label: 'Saldo Acumulado',
+            data: history.map((p) => p.balance),
+            borderColor: primary,
+            backgroundColor: primary + '1A',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 2,
+            pointBackgroundColor: primary,
           },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { position: 'top' } },
+        plugins: { legend: { display: false } },
+        scales: {
+          x: {
+            ticks: { color: mutedForeground },
+            grid: { color: border },
+          },
+          y: {
+            ticks: {
+              color: mutedForeground,
+              callback: (value) =>
+                new Intl.NumberFormat('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL',
+                  maximumFractionDigits: 0,
+                }).format(Number(value)),
+            },
+            grid: { color: border },
+          },
+        },
       },
     });
-  }
-
-  private destroyCharts(): void {
-    this.incomeExpenseChart?.destroy();
-    this.nextMonthChart?.destroy();
   }
 
   calculateProjections(): void {

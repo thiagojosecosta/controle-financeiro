@@ -1,29 +1,35 @@
-/* Reset básico e fonte */
+/* Reset básico. A fonte já vem do body (styles.css) por herança — definir
+   font-family aqui de novo (mesmo com especificidade baixa) sobrescreve a
+   fonte de ícones do Font Awesome nos ícones que ficam direto nesta casca
+   (busca, menu de usuário), então não repetimos isso aqui. */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif;
 }
 
 .dashboard-container {
   position: relative;
   width: 100%;
   min-height: 100vh;
-  background-color: #f0f2f5;
-  color: #333;
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 /* --- BARRA LATERAL (SIDEBAR) --- */
+/* Flutua com um respiro em volta (topo, esquerda e base), tipo o Dock do
+   macOS, em vez de ficar colada nas bordas da tela com cantos retos. */
 .sidebar {
   position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
+  top: 16px;
+  left: 16px;
+  height: calc(100% - 32px);
   width: 250px;
-  background-color: #2c3e50;
-  color: #ecf0f1;
+  background-color: var(--card);
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
   padding: 20px 15px;
@@ -40,16 +46,17 @@
   display: flex;
   align-items: center;
   text-decoration: none;
-  color: #ecf0f1;
+  color: var(--foreground);
   gap: 10px;
   overflow: hidden;
 }
 
 .logo-icon {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: bold;
-  background-color: #3498db;
-  border-radius: 50%;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius-full);
   width: 35px;
   height: 35px;
   display: flex;
@@ -59,10 +66,80 @@
 }
 
 .title-text {
-  font-size: 24px;
+  font-size: 20px;
+  font-weight: 700;
   white-space: nowrap;
   opacity: 1;
   transition: opacity 0.2s ease-in-out;
+}
+
+/* --- BUSCA --- */
+.sidebar-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 20px 0;
+}
+
+/* Botão de alternar tema: mesmo estilo circular usado no login/cadastro,
+   sempre no canto superior direito, para manter um padrão único no sistema. */
+.theme-toggle-btn {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--muted-foreground);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: color 0.2s, border-color 0.2s, transform 0.2s ease,
+    box-shadow 0.2s;
+}
+.theme-toggle-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+  transform: scale(1.08);
+  box-shadow: var(--shadow-md);
+}
+.theme-toggle-btn:active {
+  transform: scale(0.88);
+}
+
+.sidebar-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+.sidebar-search i {
+  position: absolute;
+  left: 12px;
+  color: var(--muted-foreground);
+  font-size: 13px;
+  pointer-events: none;
+}
+.sidebar-search input {
+  width: 100%;
+  padding: 9px 12px 9px 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--secondary);
+  color: var(--foreground);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.sidebar-search input:focus {
+  border-color: var(--ring);
+  background-color: var(--card);
+}
+.sidebar-search input::placeholder {
+  color: var(--muted-foreground);
 }
 
 .sidebar-nav {
@@ -73,31 +150,34 @@
   display: flex;
   align-items: center;
   gap: 15px;
-  color: #bdc3c7;
+  color: var(--muted-foreground);
   text-decoration: none;
   padding: 12px 15px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  transition: background-color 0.3s, color 0.3s;
+  border-radius: var(--radius);
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
   overflow: hidden;
   white-space: nowrap;
 }
 
 .nav-item svg {
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .nav-item:hover {
-  background-color: #34495e;
-  color: #ffffff;
+  background-color: var(--secondary);
+  color: var(--foreground);
 }
 
 .nav-item.active {
-  background-color: #3498db;
-  color: #ffffff;
-  font-weight: bold;
+  background-color: rgba(99, 102, 241, 0.08);
+  color: var(--primary);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--primary);
 }
 
 .sidebar-footer {
@@ -106,17 +186,33 @@
 
 /* --- CONTEÚDO PRINCIPAL --- */
 .main-content {
-  margin-left: 250px;
-  padding: 30px 40px;
-  width: calc(100% - 250px);
+  margin-left: 282px;
+  width: calc(100% - 282px);
   transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
 }
 
+/* Envolve só o router-outlet, separado do cabeçalho — assim o cabeçalho
+   controla seu próprio espaçamento em relação ao topo (fixo, alinhado com
+   a borda da sidebar) sem depender do padding do conteúdo da página. */
+.page-content {
+  padding: 0 40px 30px 40px;
+}
+
+/* Barra fixa: o hambúrguer e o botão de tema precisam continuar acessíveis
+   mesmo com a página rolada, então o cabeçalho gruda no topo da viewport
+   (mesmo padrão de "chrome" fixo que a sidebar já usa) em vez de rolar
+   junto com o conteúdo. z-index abaixo do backdrop mobile (90) para o
+   header ficar corretamente escurecido quando a gaveta abre. */
 .main-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  padding: 37px 40px 14px 40px;
+  margin: 0 0 16px 0;
+  background-color: var(--background);
 }
 
 .header-left {
@@ -125,36 +221,83 @@
   gap: 15px;
 }
 
-h1 {
-  font-size: 28px;
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
+h1 {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* Mesmo botão circular do alternador de tema, para manter um padrão único
+   de ícones no cabeçalho. As três linhas do SVG viram um "X" com uma
+   animação suave quando o menu é aberto. */
 .hamburger-btn {
-  background: none;
-  border: none;
-  color: #333;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--muted-foreground);
   cursor: pointer;
-  padding: 5px;
+  box-shadow: var(--shadow-sm);
+  transition: color 0.2s, border-color 0.2s, transform 0.2s ease,
+    box-shadow 0.2s;
+}
+.hamburger-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+  transform: scale(1.08);
+  box-shadow: var(--shadow-md);
+}
+.hamburger-btn:active {
+  transform: scale(0.88);
 }
 
 .hamburger-btn svg {
   display: block;
+  overflow: visible;
+}
+
+.hamburger-btn .bar {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s ease;
+}
+.hamburger-btn.is-open .bar-top {
+  transform: translateY(6px) rotate(45deg);
+}
+.hamburger-btn.is-open .bar-middle {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.hamburger-btn.is-open .bar-bottom {
+  transform: translateY(-6px) rotate(-45deg);
 }
 
 .btn-add-transaction {
-  background-color: #3498db;
-  color: white;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
   border: none;
   padding: 12px 20px;
-  border-radius: 8px;
+  border-radius: var(--radius);
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.2s;
 }
 
 .btn-add-transaction:hover {
-  background-color: #2980b9;
+  background-color: var(--primary-hover);
 }
 
 /* --- ESTILOS PARA SIDEBAR RECOLHIDA --- */
@@ -171,6 +314,17 @@ h1 {
   margin-left: -10px; /* Ajuda a esconder o texto mais rápido */
 }
 
+/* Esconde a busca, o botão de tema e as infos do usuário quando a sidebar
+   está em modo ícone */
+.sidebar-collapsed .sidebar-toolbar,
+.sidebar-collapsed .user-info,
+.sidebar-collapsed .user-menu-chevron {
+  display: none;
+}
+.sidebar-collapsed .user-menu-trigger {
+  justify-content: center;
+}
+
 /* Centraliza os ícones */
 .sidebar-collapsed .sidebar .nav-item,
 .sidebar-collapsed .sidebar .sidebar-header {
@@ -185,13 +339,115 @@ h1 {
 
 /* Ajusta o conteúdo principal para ocupar o espaço */
 .sidebar-collapsed .main-content {
-  margin-left: 80px;
-  width: calc(100% - 80px);
+  margin-left: 112px;
+  width: calc(100% - 112px);
 }
-/* Estilo para o botão de Sair ao passar o mouse */
-.sidebar-footer .nav-item:hover {
-  background-color: #e74c3c; /* Um tom de vermelho para alerta */
-  color: #ffffff; /* Garante que o ícone e o texto fiquem brancos */
+
+/* --- MENU DE USUÁRIO --- */
+.user-menu {
+  position: relative;
+}
+.user-menu-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px;
+  background: none;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.user-menu-trigger:hover {
+  background-color: var(--secondary);
+}
+.user-avatar {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+.user-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: hidden;
+}
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.user-email {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.user-menu-chevron {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+.user-dropdown {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 6px;
+  z-index: 110;
+}
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: none;
+  background: none;
+  border-radius: var(--radius);
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+.dropdown-item i {
+  width: 16px;
+  text-align: center;
+  color: var(--muted-foreground);
+}
+.dropdown-item:hover {
+  background-color: var(--secondary);
+}
+.dropdown-item.danger:hover {
+  background-color: var(--expense-bg);
+  color: var(--destructive);
+}
+.dropdown-item.danger:hover i {
+  color: var(--destructive);
 }
 
 /* Fundo escurecido atrás da sidebar aberta no mobile (nada no desktop) */
@@ -201,8 +457,11 @@ h1 {
 
 /* --- RESPONSIVIDADE (TABLET E CELULAR) --- */
 @media (max-width: 900px) {
-  .main-content {
-    padding: 24px;
+  .page-content {
+    padding: 0 24px 24px 24px;
+  }
+  .main-header {
+    padding: 37px 24px 14px 24px;
   }
 }
 
@@ -228,6 +487,17 @@ h1 {
     opacity: 1;
     margin-left: 0;
   }
+  .sidebar-toolbar,
+  .sidebar-search,
+  .user-info {
+    display: flex !important;
+  }
+  .user-menu-chevron {
+    display: inline-block !important;
+  }
+  .user-menu-trigger {
+    justify-content: flex-start;
+  }
   .sidebar-collapsed .sidebar .nav-item,
   .sidebar-collapsed .sidebar .sidebar-header,
   .sidebar-collapsed .sidebar .sidebar-title-link {
@@ -240,7 +510,12 @@ h1 {
   .sidebar-collapsed .main-content {
     margin-left: 0;
     width: 100%;
-    padding: 16px;
+  }
+  .page-content {
+    padding: 0 16px 16px 16px;
+  }
+  .main-header {
+    padding: 37px 16px 14px 16px;
   }
 
   .sidebar-backdrop {

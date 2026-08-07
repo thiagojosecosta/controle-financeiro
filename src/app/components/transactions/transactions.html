@@ -22,59 +22,98 @@
     </div>
   </div>
 
+  <div class="search-banner" *ngIf="searchQuery">
+    <span
+      >Resultados para “<strong>{{ searchQuery }}</strong
+      >”</span
+    >
+    <button class="link-btn" (click)="clearSearch()">Limpar</button>
+  </div>
+
   <div class="transactions-container-card">
     <div
       *ngIf="paginatedTransactions.length > 0; else noTransactions"
-      class="transactions-list"
+      class="transactions-table-wrapper"
     >
-      <div
-        *ngFor="let transaction of paginatedTransactions"
-        class="transaction-item"
-        [ngClass]="transaction.type"
-      >
-        <div class="transaction-info">
-          <div class="transaction-icon" [ngClass]="transaction.type">
-            <i
-              class="fas"
-              [ngClass]="
-                transaction.type === 'income' ? 'fa-arrow-up' : 'fa-arrow-down'
-              "
-            ></i>
-          </div>
-          <div class="transaction-details">
-            <span class="transaction-description">{{
-              transaction.description
-            }}</span>
-            <span class="transaction-date">{{
-              transaction.date | date : "dd/MM/yyyy" : "UTC"
-            }}</span>
-          </div>
-        </div>
-        <div class="transaction-value">
-          <span *ngIf="isBalanceVisible">{{
-            transaction.value | currency : "BRL"
-          }}</span>
-          <span *ngIf="!isBalanceVisible">R$ ••••••</span>
-        </div>
-        <div class="transaction-actions">
-          <ng-container *ngIf="transaction.isRecurring">
-            <button
-              (click)="openModal(transaction)"
-              class="action-btn edit-btn"
-              title="Editar Regra"
-            >
-              <i class="fas fa-pencil-alt"></i>
-            </button>
-            <button
-              (click)="onDelete(transaction.sourceRuleId!)"
-              class="action-btn delete-btn"
-              title="Excluir Regra"
-            >
-              <i class="fas fa-trash-alt"></i>
-            </button>
-          </ng-container>
-        </div>
-      </div>
+      <table class="transactions-table">
+        <thead>
+          <tr>
+            <th class="col-date">Data</th>
+            <th class="col-description">Descrição</th>
+            <th class="col-category">Categoria</th>
+            <th class="col-value">Valor</th>
+            <th class="col-actions">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let transaction of paginatedTransactions"
+            [ngClass]="transaction.type"
+          >
+            <td class="col-date">
+              {{ transaction.date | date : "dd/MM/yyyy" : "UTC" }}
+            </td>
+            <td class="col-description">
+              <div class="description-cell">
+                <div class="transaction-icon" [ngClass]="transaction.type">
+                  <i
+                    class="fas"
+                    [ngClass]="
+                      transaction.type === 'income'
+                        ? 'fa-arrow-up'
+                        : 'fa-arrow-down'
+                    "
+                  ></i>
+                </div>
+                <span>{{ transaction.description }}</span>
+              </div>
+            </td>
+            <td class="col-category">
+              <span
+                class="category-chip"
+                *ngIf="getCategory(transaction.categoryId) as cat; else noCategoryChip"
+                [style.background]="cat.color + '1A'"
+                [style.color]="cat.color"
+              >
+                <i class="fas" [ngClass]="cat.icon"></i>
+                {{ cat.name }}
+              </span>
+              <ng-template #noCategoryChip>
+                <span class="category-chip category-chip-empty">Sem categoria</span>
+              </ng-template>
+            </td>
+            <td class="col-value">
+              <span class="transaction-value tabular-nums" *ngIf="isBalanceVisible">
+                {{ transaction.type === "income" ? "+" : "−"
+                }}{{ transaction.value | currency : "BRL" }}
+              </span>
+              <span class="transaction-value" *ngIf="!isBalanceVisible"
+                >R$ ••••••</span
+              >
+            </td>
+            <td class="col-actions">
+              <div class="transaction-actions">
+                <ng-container *ngIf="transaction.isRecurring">
+                  <button
+                    (click)="openModal(transaction)"
+                    class="action-btn edit-btn"
+                    title="Editar Regra"
+                  >
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                  <button
+                    (click)="onDelete(transaction.sourceRuleId!)"
+                    class="action-btn delete-btn"
+                    title="Excluir Regra"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </ng-container>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <ng-template #noTransactions>
       <div class="no-transactions">
@@ -103,13 +142,33 @@
         <label>Tipo:</label>
         <div class="type-selection">
           <label>
-            <input type="radio" formControlName="type" value="income" /> Receita
+            <input
+              type="radio"
+              formControlName="type"
+              value="income"
+              (change)="transactionForm.patchValue({ categoryId: null })"
+            />
+            Receita
           </label>
           <label>
-            <input type="radio" formControlName="type" value="expense" />
+            <input
+              type="radio"
+              formControlName="type"
+              value="expense"
+              (change)="transactionForm.patchValue({ categoryId: null })"
+            />
             Despesa
           </label>
         </div>
+      </div>
+      <div class="form-group">
+        <label for="categoryId">Categoria:</label>
+        <select id="categoryId" formControlName="categoryId">
+          <option [ngValue]="null">Sem categoria</option>
+          <option *ngFor="let cat of categoriesForSelectedType" [ngValue]="cat.id">
+            {{ cat.name }}
+          </option>
+        </select>
       </div>
       <div class="form-group">
         <label for="description">Descrição:</label>
@@ -136,7 +195,10 @@
             ? "Data da primeira parcela"
             : "Data"
         }}</label>
-        <input type="date" id="date" formControlName="date" />
+        <app-date-picker
+          [value]="transactionForm.get('date')?.value"
+          (valueChange)="transactionForm.patchValue({ date: $event })"
+        ></app-date-picker>
       </div>
       <div class="form-group">
         <label class="checkbox-label">

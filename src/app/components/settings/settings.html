@@ -5,6 +5,13 @@
   </div>
 
   <div class="card">
+    <div class="profile-hero">
+      <span class="profile-avatar">{{ profileInitial() }}</span>
+      <div class="profile-hero-info">
+        <span class="profile-hero-name">{{ profileName() }}</span>
+        <span class="profile-hero-email">{{ profileEmail() }}</span>
+      </div>
+    </div>
     <div class="card-header"><h3>Informações do Perfil</h3></div>
     <div class="card-body">
       <form [formGroup]="profileForm" (ngSubmit)="onProfileSubmit()">
@@ -39,7 +46,7 @@
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" id="password-card">
     <div class="card-header"><h3>Alterar Senha</h3></div>
     <div class="card-body">
       <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">

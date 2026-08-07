@@ -15,6 +15,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Transaction } from '../../models/transaction';
 import { RecurrenceRule } from '../../models/recurrence-rule.model';
 import { FinanceService } from '../../services/finance.service';
@@ -23,11 +24,19 @@ import { TransactionService } from '../../services/transaction.service';
 import { NotificationService } from '../../services/notification.service';
 import { CurrencyMaskDirective } from '../../directives/currency-mask.directive';
 import { getDatePart } from '../../utils/date.util';
+import { CategoryService } from '../../services/category.service';
+import { Category } from '../../models/category';
+import { DatePickerComponent } from '../date-picker/date-picker';
 
 @Component({
   selector: 'app-transactions',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, CurrencyMaskDirective],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    CurrencyMaskDirective,
+    DatePickerComponent,
+  ],
   templateUrl: './transactions.html',
   styleUrls: ['./transactions.css'],
 })
@@ -51,12 +60,18 @@ export class TransactionsComponent implements OnInit {
 
   @Output() transactionSaved = new EventEmitter<void>();
 
+  categories: Category[] = [];
+  searchQuery: string | null = null;
+
   constructor(
     private fb: FormBuilder,
     private financeService: FinanceService,
     private authService: AuthService,
     private transactionService: TransactionService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private categoryService: CategoryService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -65,13 +80,32 @@ export class TransactionsComponent implements OnInit {
       description: ['', Validators.required],
       value: [null, [Validators.required, Validators.min(0.01)]],
       date: ['', Validators.required],
+      categoryId: [null],
       isRecurring: [false],
       installments: [null],
     });
+    this.categories = this.categoryService.getCategories();
+    this.searchQuery = this.route.snapshot.queryParamMap.get('q');
     this.loadAndFilterTransactions();
     if (this.autoOpen) {
       this.openModal();
     }
+  }
+
+  clearSearch(): void {
+    this.searchQuery = null;
+    this.router.navigate(['/dashboard/transactions']);
+    this.loadAndFilterTransactions();
+  }
+
+  get categoriesForSelectedType(): Category[] {
+    const type = this.transactionForm?.get('type')?.value;
+    return this.categories.filter((c) => c.type === type);
+  }
+
+  getCategory(categoryId: string | null | undefined): Category | null {
+    if (!categoryId) return null;
+    return this.categories.find((c) => c.id === categoryId) ?? null;
   }
 
   loadAndFilterTransactions(): void {
@@ -84,6 +118,13 @@ export class TransactionsComponent implements OnInit {
         (year === today.getFullYear() && month <= today.getMonth())
       );
     });
+    if (this.searchQuery) {
+      const q = this.searchQuery.toLowerCase();
+      this.allTransactions = this.allTransactions.filter((t) =>
+        t.description.toLowerCase().includes(q)
+      );
+    }
+    this.currentPage = 1;
     this.updatePagination();
   }
 
@@ -131,6 +172,7 @@ export class TransactionsComponent implements OnInit {
           description: ruleToEdit.description,
           value: ruleToEdit.value,
           date: ruleToEdit.startDate,
+          categoryId: ruleToEdit.categoryId ?? null,
           isRecurring: true,
           installments: ruleToEdit.installments || null,
         });
@@ -140,6 +182,7 @@ export class TransactionsComponent implements OnInit {
       this.transactionForm.reset({
         type: 'expense',
         date: new Date().toISOString().split('T')[0],
+        categoryId: null,
         isRecurring: false,
         installments: null,
       });
@@ -181,6 +224,7 @@ export class TransactionsComponent implements OnInit {
           dayOfMonth: new Date(formValue.date + 'T00:00:00').getDate(),
           installments: formValue.installments || null,
           isActive: true,
+          categoryId: formValue.categoryId || null,
         };
         this.transactionService.updateRecurrenceRule(updatedRule);
         this.notificationService.show(
@@ -198,6 +242,7 @@ export class TransactionsComponent implements OnInit {
           dayOfMonth: new Date(formValue.date + 'T00:00:00').getDate(),
           installments: formValue.installments || null,
           isActive: true,
+          categoryId: formValue.categoryId || null,
         };
         this.transactionService.addRecurrenceRule(newRule);
         this.notificationService.show(
@@ -214,6 +259,7 @@ export class TransactionsComponent implements OnInit {
         type: formValue.type,
         date: new Date(formValue.date).toISOString(),
         isRecurring: false,
+        categoryId: formValue.categoryId || null,
       };
       this.transactionService.addTransaction(newTransaction);
       this.notificationService.show(
