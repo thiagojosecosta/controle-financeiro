@@ -1,121 +1,86 @@
-# Controle Financeiro Pessoal 💰
+# EasyMoney — Controle Financeiro Pessoal
 
-![Página Inicial](screenshots/home.png)
+## Sobre
 
-## 📝 Sobre o Projeto
+Projeto desenvolvido como atividade da disciplina de Oficina de Desenvolvimento Web do IFPR – Campus Palmas. Trata-se de uma aplicação web de página única (SPA) para controle de finanças pessoais, que permite cadastrar receitas e despesas, acompanhar o saldo do mês e visualizar relatórios sobre a situação financeira.
 
-Este é um projeto de um sistema de Controle Financeiro Pessoal, desenvolvido como atividade para a matéria de **Oficina de Desenvolvimento Web** do curso de Análise e Desenvolvimento de Sistemas do **IFPR - Campus Palmas**.
+O projeto é focado no frontend e, por isso, não possui servidor nem banco de dados configurados: os dados ficam salvos apenas no navegador. A integração com um backend poderá ser feita futuramente.
 
-O objetivo principal foi criar uma aplicação **Single-Page Application (SPA)** moderna e interativa, focada em proporcionar uma excelente experiência ao utilizador na gestão de suas finanças. A aplicação permite que o utilizador se registe, controle as suas receitas e despesas, e visualize relatórios claros sobre a sua situação financeira.
+## Tecnologias usadas
 
----
+- [Angular](https://angular.dev): framework para a construção da interface, na versão 20.
+- [TypeScript](https://www.typescriptlang.org): linguagem utilizada no desenvolvimento.
+- [Chart.js](https://www.chartjs.org): biblioteca para os gráficos dos relatórios.
+- [Font Awesome](https://fontawesome.com): biblioteca de ícones.
+- [Visual Studio Code](https://code.visualstudio.com): editor de código.
 
-## ✨ Funcionalidades Principais
+## Funcionalidades
 
-O sistema foi desenhado para ser uma ferramenta completa e intuitiva. As suas principais funcionalidades são:
+### Página inicial
 
-- **🔐 Autenticação de Utilizador:** Sistema seguro de Registo e Login para proteger os dados.
-- **📊 Dashboard Principal:** Uma visão geral e imediata da saúde financeira do mês atual, com saldos, total de receitas, total de despesas e as transações mais recentes.
-- **💸 Gestão de Transações:**
-  - Adição de novas receitas ou despesas através de um formulário intuitivo em pop-up.
-  - Funcionalidade de transações **recorrentes** (como salários) e **parceladas** (como compras a prazo).
-  - Edição e exclusão de regras de transação diretamente das listas.
-- **📈 Relatórios Detalhados:**
-  - Gráficos de pizza que comparam as receitas e despesas do mês atual.
-  - Projeção visual para o próximo mês, ajudando no planeamento financeiro.
-  - Histórico completo de transações com paginação.
-- **⚙️ Configurações de Perfil:** O utilizador pode alterar o seu nome e a sua senha de acesso.
-- **👁️ Modo de Privacidade:** Funcionalidade para ocultar/mostrar todos os valores monetários da tela, garantindo a privacidade do utilizador.
+Apresenta o sistema e direciona o usuário para o acesso à conta.
 
----
+<p align="center">
+  <img src="screenshots/home.png" alt="Página inicial" width="700">
+</p>
 
-## 📸 Screenshots
+### Criar conta
 
-<table>
-  <tr>
-    <td align="center"><strong>Página Inicial</strong></td>
-    <td align="center"><strong>Dashboard Principal</strong></td>
-  </tr>
-  <tr>
-    <td><img src="screenshots/home.png" alt="Página inicial da aplicação." width="400"/></td>
-    <td><img src="screenshots/dashboard.png" alt="Dashboard com resumo mensal e transações recentes." width="400"/></td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Relatórios Financeiros</strong></td>
-    <td align="center"><strong>Configurações de Perfil</strong></td>
-  </tr>
-  <tr>
-    <td><img src="screenshots/relatório.png" alt="Tela de relatórios com gráficos e histórico de transações." width="400"/></td>
-    <td><img src="screenshots/configurações.png" alt="Tela de configurações onde o utilizador pode alterar seus dados e senha." width="400"/></td>
-  </tr>
-   <tr>
-    <td align="center"><strong>Login</strong></td>
-    <td align="center"><strong>Criar Conta</strong></td>
-  </tr>
-  <tr>
-    <td><img src="screenshots/login.png" alt="Tela de login." width="400"/></td>
-    <td><img src="screenshots/criarconta.png" alt="Tela de criação de conta." width="400"/></td>
-  </tr>
-</table>
+Cadastro de novos usuários com nome, e-mail e senha, com validação dos campos e confirmação da senha.
 
----
+<p align="center">
+  <img src="screenshots/criarconta.png" alt="Tela de criação de conta" width="700">
+</p>
 
-## 🚀 Como Executar o Projeto
+### Login
 
-Para executar este projeto localmente, siga os passos abaixo.
+Acesso ao sistema com e-mail e senha. As páginas internas só podem ser acessadas por usuários autenticados.
 
-### Pré-requisitos
+<p align="center">
+  <img src="screenshots/login.png" alt="Tela de login" width="700">
+</p>
 
-Antes de começar, você vai precisar ter as seguintes ferramentas instaladas na sua máquina:
+### Dashboard
 
-- [Git](https://git-scm.com)
-- [Node.js](https://nodejs.org/en/) (que já vem com o npm)
-- [Angular CLI](https://angular.io/cli) (`npm install -g @angular/cli`)
+Visão geral do mês atual, com saldo, total de receitas, total de despesas e as transações mais recentes. Novas receitas e despesas podem ser lançadas diretamente desta tela, inclusive transações recorrentes, como salários, e parceladas, como compras a prazo.
 
-### Clonando e Instalando
+<p align="center">
+  <img src="screenshots/dashboard.png" alt="Dashboard" width="700">
+</p>
+
+### Relatórios
+
+Gráficos que comparam as receitas e despesas do mês atual, projeção para o próximo mês, lançamentos previstos e histórico completo de transações com paginação, edição e exclusão.
+
+<p align="center">
+  <img src="screenshots/relatório.png" alt="Tela de relatórios" width="700">
+</p>
+
+### Configurações
+
+Alteração do nome do usuário e da senha de acesso.
+
+<p align="center">
+  <img src="screenshots/configurações.png" alt="Tela de configurações" width="700">
+</p>
+
+### Modo de privacidade
+
+No dashboard, nas transações e nos relatórios, um botão permite ocultar e exibir os valores monetários.
+
+## Como executar
+
+É necessário ter o [Git](https://git-scm.com) e o [Node.js](https://nodejs.org) (versão 20.19 ou superior) instalados.
 
 ```bash
-# 1. Clone o repositório para a sua máquina local
-git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/seu-usuario/seu-repositorio.git)
-
-# 2. Navegue para a pasta do projeto
-cd seu-repositorio
-
-# 3. Instale todas as dependências necessárias
+git clone https://github.com/thiagojosecosta/controle-financeiro.git
+cd controle-financeiro
 npm install
+npm start
 ```
 
-### Executando a Aplicação
+A aplicação fica disponível em `http://localhost:4200/`.
 
-```bash
-# Execute o comando abaixo para iniciar o servidor de desenvolvimento
-ng serve --open
-```
+## Créditos
 
-A aplicação abrirá automaticamente no seu navegador no endereço `http://localhost:4200/`.
-
----
-
-## 🗄️ Armazenamento de Dados
-
-Para este projeto, todos os dados dos utilizadores e das transações são armazenados localmente no navegador, utilizando a **`localStorage` API**.
-
-**Justificativa:** Como o foco principal do projeto era o desenvolvimento do **frontend** e a criação de uma interface rica e reativa com Angular, optou-se por simular a persistência de dados no lado do cliente. Esta abordagem permitiu o desenvolvimento completo da experiência do utilizador sem a necessidade imediata de construir e manter um servidor backend.
-
----
-
-## 🔮 Melhorias Futuras
-
-Embora a aplicação seja totalmente funcional, existem várias melhorias que podem ser implementadas para a tornar ainda mais robusta e escalável:
-
-- **Desenvolvimento de um Backend:** A melhoria mais significativa seria a criação de uma API backend (usando Node.js com Express, por exemplo) para gerir os dados.
-- **Banco de Dados Seguro:** Com um backend, os dados seriam armazenados num banco de dados real (como PostgreSQL ou MongoDB), garantindo que a informação não se perca e possa ser acedida de múltiplos dispositivos.
-- **Autenticação com JWT:** Implementar um sistema de autenticação mais seguro, como JSON Web Tokens.
-- **Categorização de Transações:** Permitir que o utilizador categorize as suas despesas (ex: Moradia, Alimentação, Lazer) para gerar relatórios mais detalhados.
-- **Testes Unitários e de Integração:** Adicionar uma camada de testes para garantir a estabilidade e a qualidade do código.
-
----
-
-## 🎓 Créditos
-
-Este projeto foi desenvolvido como parte da avaliação da disciplina de **Oficina de Desenvolvimento Web**, ministrada pelo professor **Rafael Pagliosa**.
+Projeto desenvolvido para a disciplina de Oficina de Desenvolvimento Web, ministrada pelo professor Rafael Pagliosa.
