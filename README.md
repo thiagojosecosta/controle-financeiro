@@ -1,5 +1,12 @@
 # EasyMoney — Controle Financeiro Pessoal
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Angular-20-DD0031?logo=angular&logoColor=white" alt="Angular 20">
+  <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white" alt="TypeScript 5.8">
+  <img src="https://img.shields.io/badge/Chart.js-4.5-FF6384?logo=chartdotjs&logoColor=white" alt="Chart.js 4.5">
+  <img src="https://img.shields.io/badge/Node.js-20.19%2B-5FA04E?logo=nodedotjs&logoColor=white" alt="Node.js 20.19+">
+</p>
+
 ## Sobre
 
 Projeto desenvolvido como atividade da disciplina de Oficina de Desenvolvimento Web do IFPR – Campus Palmas. Trata-se de uma aplicação web de página única (SPA) para controle de finanças pessoais, que permite cadastrar receitas e despesas, acompanhar o saldo do mês e visualizar relatórios sobre a situação financeira.
